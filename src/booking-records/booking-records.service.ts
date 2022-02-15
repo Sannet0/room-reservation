@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { BookingRoomDto } from './dto/booking-room.dto';
+import { AverageRoomsLoadReportDto } from './dto/average-rooms-load-report.dto';
 
 @Injectable()
 export class BookingRecordsService {
   constructor(@Inject('PG_CONNECTION') private db: any) {}
 
-  async bookingRoom(row: { room_number: number, checkin_date: string, checkout_date: string }): Promise<[] | HttpException> {
+  async bookingRoom(row: BookingRoomDto): Promise<[] | HttpException> {
     try {
       const checkin_date = new Date(row.checkin_date);
       const checkout_date = new Date(row.checkout_date);
@@ -64,7 +66,7 @@ export class BookingRecordsService {
     }
   }
 
-  async averageRoomsLoadReport(row: { checkin_date: string, checkout_date: string }): Promise<{ record_month: string, room_number: number, average: string }[] | HttpException> {
+  async averageRoomsLoadReport(row: AverageRoomsLoadReportDto): Promise<{ record_month: string, room_number: number, average: string }[] | HttpException> {
     try {
       const checkin_date = new Date(row.checkin_date);
       const checkout_date = new Date(row.checkout_date);

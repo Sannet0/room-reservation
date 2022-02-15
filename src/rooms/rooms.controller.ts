@@ -3,6 +3,7 @@ import { RoomsService } from './rooms.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NonOccupiedRoomsResponseEntity } from './entity/non-occupied-rooms-response.entity';
 import { NonOccupiedRoomsParamEntity } from './entity/non-occupied-rooms-param.entity';
+import { GetNonOccupiedRoomsDto } from './dto/get-non-occupied-rooms.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -14,7 +15,7 @@ export class RoomsController {
   @ApiParam({ name: 'param', type: NonOccupiedRoomsParamEntity })
   @ApiResponse({ status: 200, type: NonOccupiedRoomsResponseEntity, isArray: true })
   @Get('non-occupied-rooms')
-  async nonOccupiedRooms(@Body() body: { checkin_date: string, checkout_date: string }): Promise<{ room_number: number }[] | HttpException> {
+  async nonOccupiedRooms(@Body() body: GetNonOccupiedRoomsDto): Promise<{ room_number: number }[] | HttpException> {
     return this.roomsService.nonOccupiedRooms(body);
   }
 }

@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { GetNonOccupiedRoomsDto } from './dto/get-non-occupied-rooms.dto';
 
 @Injectable()
 export class RoomsService {
   constructor(@Inject('PG_CONNECTION') private db: any) {}
 
-  async nonOccupiedRooms(row: { checkin_date: string, checkout_date: string }): Promise<{ room_number: number }[] | HttpException> {
+  async nonOccupiedRooms(row: GetNonOccupiedRoomsDto): Promise<{ room_number: number }[] | HttpException> {
     try {
       const checkin_date = new Date(row.checkin_date);
       const checkout_date = new Date(row.checkout_date);
