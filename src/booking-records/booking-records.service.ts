@@ -28,6 +28,8 @@ export class BookingRecordsService {
         return new HttpException('no such room', HttpStatus.NOT_FOUND);
       }
 
+      const actualRoom = rooms.rows[0]
+
       const occupiedRooms = await this.db.query(`
         SELECT booking_records.room_number FROM booking_records 
         WHERE ('${ row.checkin_date }' < booking_records.checkout_date)
@@ -40,11 +42,20 @@ export class BookingRecordsService {
         return new HttpException('room occupied', HttpStatus.BAD_REQUEST);
       }
 
+      let totalPrice = actualRoom.price;
+
+      if(actualRoom.price >= 10) {
+        totalPrice = actualRoom.price / 100 * 10;
+      } else if(actualRoom.price >= 20) {
+        totalPrice = actualRoom.price / 100 * 20;
+      }
+
       await this.db.query(`
-        INSERT INTO booking_records ("room_number", "checkin_date", "checkout_date") 
+        INSERT INTO booking_records ("room_number", "checkin_date", "checkout_date", "total_price") 
         VALUES ('${ row.room_number }', 
         '${ row.checkin_date }', 
-        '${ row.checkout_date }')`
+        '${ row.checkout_date }',
+        '${ totalPrice }')`
       );
 
       return new HttpException('room reserved successfully', HttpStatus.CREATED);
