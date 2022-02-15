@@ -10,11 +10,11 @@ export class BookingRecordsService {
       const checkout_date = new Date(row.checkout_date);
 
       if(checkin_date >= checkout_date) {
-        throw new HttpException('check-in date cannot be greater or equal than check-out date', HttpStatus.BAD_REQUEST);
+        return new HttpException('check-in date cannot be greater or equal than check-out date', HttpStatus.BAD_REQUEST);
       }
 
       if(checkin_date.getDay() === 1 || checkin_date.getDay() === 4 || checkout_date.getDay() === 1 || checkout_date.getDay() === 4) {
-        throw new HttpException('check-in and check-out date cannot be monday or thursday', HttpStatus.BAD_REQUEST);
+        return new HttpException('check-in and check-out date cannot be monday or thursday', HttpStatus.BAD_REQUEST);
       }
 
       row.checkin_date = `${ checkin_date.getFullYear() }-${ checkin_date.getMonth() + 1 }-${ checkin_date.getDate() }`;
@@ -25,7 +25,7 @@ export class BookingRecordsService {
       `);
 
       if(rooms.rows.length === 0) {
-        throw new HttpException('no such room', HttpStatus.NOT_FOUND);
+        return new HttpException('no such room', HttpStatus.NOT_FOUND);
       }
 
       const occupiedRooms = await this.db.query(`
@@ -37,19 +37,19 @@ export class BookingRecordsService {
       `);
 
       if(occupiedRooms.rows.length !== 0) {
-        throw new HttpException('room occupied', HttpStatus.BAD_REQUEST);
+        return new HttpException('room occupied', HttpStatus.BAD_REQUEST);
       }
 
-      const result = await this.db.query(`
+      await this.db.query(`
         INSERT INTO booking_records ("room_number", "checkin_date", "checkout_date") 
         VALUES ('${ row.room_number }', 
         '${ row.checkin_date }', 
         '${ row.checkout_date }')`
       );
 
-      return result.rows;
+      return new HttpException('room reserved successfully', HttpStatus.CREATED);
     } catch (err) {
-      throw new HttpException(err.detail || err.response || 'something wrong', err.status || HttpStatus.BAD_REQUEST);
+      return new HttpException(err.detail || err.response || 'something wrong', err.status || HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -73,10 +73,9 @@ export class BookingRecordsService {
         ORDER BY record_month, booking_records.room_number`
       );
 
-      return result.rows;
+      return result.rows
     } catch (err) {
-      console.log("LOOOG", err);
-      throw new HttpException(err.detail || err.response || 'something wrong', err.status || HttpStatus.BAD_REQUEST);
+      return new HttpException(err.detail || err.response || 'something wrong', err.status || HttpStatus.BAD_REQUEST);
     }
   }
 }

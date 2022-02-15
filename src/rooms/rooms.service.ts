@@ -14,18 +14,17 @@ export class RoomsService {
 
       const result = await this.db.query(`
         SELECT r.room_number FROM rooms	
-        join(
-          select * from booking_records AS br 
+        JOIN(
+          SELECT * FROM booking_records AS br 
           WHERE ('${ row.checkin_date }' < br.checkout_date)
           AND ('${ row.checkout_date }' > br.checkin_date)) AS br on br.room_number = rooms.room_number
         RIGHT OUTER JOIN rooms AS r ON r.room_number = rooms.room_number 
-        WHERE rooms.room_number is NULL`
-      );
+        WHERE rooms.room_number is NULL
+      `);
 
       return result.rows;
     } catch (err) {
-      console.log("LOOOG", err);
-      throw new HttpException(err.detail || err.response || 'something wrong', err.status || HttpStatus.BAD_REQUEST);
+      return new HttpException(err.detail || err.response || 'something wrong', err.status || HttpStatus.BAD_REQUEST);
     }
   }
 }
